@@ -22,7 +22,7 @@ def get_active_profiles():
     Returns a list of strings each representing an active OpenVPN profile.
     """
     stream = os.popen("tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep \"^V\" | cut -d '=' -f 2")
-    return filter(len, stream.read().split('\n'))
+    return list(filter(len, stream.read().split('\n')))
 
 
 def create_profile(new_profile_name):
