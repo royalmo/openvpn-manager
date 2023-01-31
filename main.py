@@ -8,7 +8,7 @@ from configparser import ConfigParser
 from telepot.loop import MessageLoop
 
 # Thanks https://stackoverflow.com/q/1432924/9643618
-os.chdir(os.path.dirname(sys.argv[0]))
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 config = ConfigParser()
 config.read("settings.ini")
