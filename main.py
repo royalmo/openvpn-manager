@@ -22,7 +22,7 @@ def get_active_profiles():
     Returns a list of strings each representing an active OpenVPN profile.
     """
     stream = os.popen("tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep \"^V\" | cut -d '=' -f 2")
-    return stream.read().split('\n')
+    return filter(len, stream.read().split('\n'))
 
 
 def create_profile(new_profile_name):
@@ -102,7 +102,7 @@ def handle(msg):
             bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` is already in use!", parse_mode='Markdown')
             return
         bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` created!", parse_mode='Markdown')
-        bot.sendDocument(chat_id, document=create_profile(new_profile_name), caption=f"{new_profile_name}.ovpn")
+        bot.sendDocument(chat_id, document=(f"{new_profile_name}.ovpn", create_profile(new_profile_name)))
         return
 
     if message.startswith('/revoke'):
