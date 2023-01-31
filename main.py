@@ -27,6 +27,8 @@ def create_profile(new_profile_name):
 
     Simulating SH (source: openvpn-install.sh):
     ```sh
+    cd /etc/openvpn/server/easy-rsa/
+    ./easyrsa --batch --days=3650 build-client-full "$client" nopass
     {
     cat /etc/openvpn/server/client-common.txt
     echo "<ca>"
@@ -44,6 +46,7 @@ def create_profile(new_profile_name):
     } > ~/"$client".ovpn
     ```
     """
+    os.system(f"/etc/openvpn/server/easy-rsa/easyrsa --batch --days=3650 build-client-full {new_profile_name} nopass")
     output1 = os.popen("cat /etc/openvpn/server/client-common.txt").read()
     output2 = os.popen("cat /etc/openvpn/server/easy-rsa/pki/ca.crt").read()
     output3 = os.popen(f"sed -ne '/BEGIN CERTIFICATE/,$ p' /etc/openvpn/server/easy-rsa/pki/issued/{new_profile_name}.crt").read()
@@ -113,7 +116,7 @@ def handle(msg):
     if message.startswith('/active'):
         active_profiles = get_active_profiles()
         if len(active_profiles) > 0:
-            parsed_profiles = '\n- '.join(active_profiles)
+            parsed_profiles = '- '.join(active_profiles)
             bot.sendMessage(chat_id, f"*ACTIVE OPENVPN PROFILES*\n- {parsed_profiles}", parse_mode='Markdown')
         else:
             bot.sendMessage(chat_id, "There aren't any active profiles to show.")
