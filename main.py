@@ -50,7 +50,7 @@ def create_profile(new_profile_name):
     output4 = os.popen(f"cat /etc/openvpn/server/easy-rsa/pki/private/{new_profile_name}.key").read()
     output5 = os.popen("sed -ne '/BEGIN OpenVPN Static key/,$ p' /etc/openvpn/server/tc.key").read()
 
-    return f"{output1}<ca>{chr(10)}{output2}</ca>{chr(10)}<cert>{chr(10)}{output3}</cert>{chr(10)}<key>{chr(10)}{output4}</key>{chr(10)}<tls-crypt>{chr(10)}{output5}</tls-crypt>{chr(10)}"
+    return f"{output1}<ca>\n{output2}</ca>\n<cert>\n{output3}</cert>\n<key>\n{output4}</key>\n<tls-crypt>\n{output5}</tls-crypt>\n"
 
 
 def revoke_profile(profile_name):
@@ -85,36 +85,36 @@ def handle(msg):
     if message.startswith('/create'):
         splitted_message = message.split(' ')
         if len(splitted_message) != 2:
-            bot.sendMessage(chat_id, "**SyntaxError!** Usage: `/create <new_profile_name>`", parse_mode='Markdown')
+            bot.sendMessage(chat_id, "*SyntaxError!* Usage: `/create <new_profile_name>`", parse_mode='Markdown')
             return
         new_profile_name = splitted_message[1]
         active_profiles = get_active_profiles()
         if new_profile_name in active_profiles:
-            bot.sendMessage(chat_id, f"**ValueError!** Profile name `{new_profile_name}` is already in use!", parse_mode='Markdown')
+            bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` is already in use!", parse_mode='Markdown')
             return
-        bot.sendMessage(chat_id, f"**Done!** Profile name `{new_profile_name}` created!", parse_mode='Markdown')
-        bot.sendDocument(chat_id, document=create_profile(new_profile_name).encode("utf-8"), filename=f"{new_profile_name}.ovpn")
+        bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` created!", parse_mode='Markdown')
+        bot.sendDocument(chat_id, document=create_profile(new_profile_name).encode("utf-8"), caption=f"{new_profile_name}.ovpn")
         return
 
     if message.startswith('/revoke'):
         splitted_message = message.split(' ')
         if len(splitted_message) != 2:
-            bot.sendMessage(chat_id, "**SyntaxError!** Usage: `/revoke <profile_name>`", parse_mode='Markdown')
+            bot.sendMessage(chat_id, "*SyntaxError!* Usage: `/revoke <profile_name>`", parse_mode='Markdown')
             return
         profile_name = splitted_message[1]
         active_profiles = get_active_profiles()
         if profile_name not in active_profiles:
-            bot.sendMessage(chat_id, f"**ValueError!** Profile name `{new_profile_name}` doesn't exist!", parse_mode='Markdown')
+            bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` doesn't exist!", parse_mode='Markdown')
             return
         revoke_profile(new_profile_name)
-        bot.sendMessage(chat_id, f"**Done!** Profile name `{new_profile_name}` revoked!", parse_mode='Markdown')
+        bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` revoked!", parse_mode='Markdown')
         return
 
     if message.startswith('/active'):
         active_profiles = get_active_profiles()
         if len(active_profiles) > 0:
             parsed_profiles = '\n- '.join(active_profiles)
-            bot.sendMessage(chat_id, f"**ACTIVE OPENVPN PROFILES**{chr(10)}- {parsed_profiles}", parse_mode='Markdown')
+            bot.sendMessage(chat_id, f"*ACTIVE OPENVPN PROFILES*\n- {parsed_profiles}", parse_mode='Markdown')
         else:
             bot.sendMessage(chat_id, "There aren't any active profiles to show.")
         return
