@@ -1,10 +1,14 @@
 #!/bin/env/python3
 
 import os
+import sys
 import time
 import telepot
 from configparser import ConfigParser
 from telepot.loop import MessageLoop
+
+# Thanks https://stackoverflow.com/q/1432924/9643618
+os.chdir(os.path.dirname(sys.argv[0]))
 
 config = ConfigParser()
 config.read("settings.ini")
@@ -46,6 +50,7 @@ def create_profile(new_profile_name):
     } > ~/"$client".ovpn
     ```
     """
+    os.chdir("/etc/openvpn/server/easy-rsa/")
     os.system(f"/etc/openvpn/server/easy-rsa/easyrsa --batch --days=3650 build-client-full {new_profile_name} nopass")
     output1 = os.popen("cat /etc/openvpn/server/client-common.txt").read()
     output2 = os.popen("cat /etc/openvpn/server/easy-rsa/pki/ca.crt").read()
@@ -71,6 +76,7 @@ def revoke_profile(profile_name):
     chown nobody:nogroup /etc/openvpn/server/crl.pem
     ```
     """
+    os.chdir("/etc/openvpn/server/easy-rsa/")
     os.system(f"/etc/openvpn/server/easy-rsa/easyrsa --batch revoke {profile_name}")
     os.system("/etc/openvpn/server/easy-rsa/easyrsa --batch --days=3650 gen-crl")
     os.system("rm -f /etc/openvpn/server/crl.pem")
