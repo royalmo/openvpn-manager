@@ -50,7 +50,7 @@ def create_profile(new_profile_name):
     output4 = os.popen(f"cat /etc/openvpn/server/easy-rsa/pki/private/{new_profile_name}.key").read()
     output5 = os.popen("sed -ne '/BEGIN OpenVPN Static key/,$ p' /etc/openvpn/server/tc.key").read()
 
-    return f"{output1}<ca>\n{output2}</ca>\n<cert>\n{output3}</cert>\n<key>\n{output4}</key>\n<tls-crypt>\n{output5}</tls-crypt>\n"
+    return f"{output1}<ca>{chr(10)}{output2}</ca>{chr(10)}<cert>{chr(10)}{output3}</cert>{chr(10)}<key>{chr(10)}{output4}</key>{chr(10)}<tls-crypt>{chr(10)}{output5}</tls-crypt>{chr(10)}"
 
 
 def revoke_profile(profile_name):
@@ -113,7 +113,8 @@ def handle(msg):
     if message.startswith('/active'):
         active_profiles = get_active_profiles()
         if len(active_profiles) > 0:
-            bot.sendMessage(chat_id, f"**ACTIVE OPENVPN PROFILES**\n- {'\n- '.join(active_profiles)}", parse_mode='Markdown')
+            parsed_profiles = '\n- '.join(active_profiles)
+            bot.sendMessage(chat_id, f"**ACTIVE OPENVPN PROFILES**{chr(10)}- {parsed_profiles}", parse_mode='Markdown')
         else:
             bot.sendMessage(chat_id, "There aren't any active profiles to show.")
         return
