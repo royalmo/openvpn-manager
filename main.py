@@ -22,7 +22,7 @@ def get_active_profiles():
     Returns a list of strings each representing an active OpenVPN profile.
     """
     stream = os.popen("tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep \"^V\" | cut -d '=' -f 2")
-    return stream.readlines()
+    return stream.read().split('\n')
 
 
 def create_profile(new_profile_name):
@@ -122,7 +122,7 @@ def handle(msg):
     if message.startswith('/active'):
         active_profiles = get_active_profiles()
         if len(active_profiles) > 0:
-            parsed_profiles = '- '.join(active_profiles)
+            parsed_profiles = '\n- '.join(active_profiles)
             bot.sendMessage(chat_id, f"*ACTIVE OPENVPN PROFILES*\n- {parsed_profiles}", parse_mode='Markdown')
         else:
             bot.sendMessage(chat_id, "There aren't any active profiles to show.")
