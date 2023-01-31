@@ -1,9 +1,9 @@
 #!/bin/env/python3
 
 import os
-import sys
 import time
 import telepot
+from io import StringIO
 from configparser import ConfigParser
 from telepot.loop import MessageLoop
 
@@ -58,7 +58,7 @@ def create_profile(new_profile_name):
     output4 = os.popen(f"cat /etc/openvpn/server/easy-rsa/pki/private/{new_profile_name}.key").read()
     output5 = os.popen("sed -ne '/BEGIN OpenVPN Static key/,$ p' /etc/openvpn/server/tc.key").read()
 
-    return f"{output1}<ca>\n{output2}</ca>\n<cert>\n{output3}</cert>\n<key>\n{output4}</key>\n<tls-crypt>\n{output5}</tls-crypt>\n"
+    return StringIO(f"{output1}<ca>\n{output2}</ca>\n<cert>\n{output3}</cert>\n<key>\n{output4}</key>\n<tls-crypt>\n{output5}</tls-crypt>\n")
 
 
 def revoke_profile(profile_name):
@@ -102,7 +102,7 @@ def handle(msg):
             bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` is already in use!", parse_mode='Markdown')
             return
         bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` created!", parse_mode='Markdown')
-        bot.sendDocument(chat_id, document=create_profile(new_profile_name).encode("utf-8"), caption=f"{new_profile_name}.ovpn")
+        bot.sendDocument(chat_id, document=create_profile(new_profile_name), caption=f"{new_profile_name}.ovpn")
         return
 
     if message.startswith('/revoke'):
@@ -113,10 +113,10 @@ def handle(msg):
         profile_name = splitted_message[1]
         active_profiles = get_active_profiles()
         if profile_name not in active_profiles:
-            bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` doesn't exist!", parse_mode='Markdown')
+            bot.sendMessage(chat_id, f"*ValueError!* Profile name `{profile_name}` doesn't exist!", parse_mode='Markdown')
             return
-        revoke_profile(new_profile_name)
-        bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` revoked!", parse_mode='Markdown')
+        revoke_profile(profile_name)
+        bot.sendMessage(chat_id, f"*Done!* Profile name `{profile_name}` revoked!", parse_mode='Markdown')
         return
 
     if message.startswith('/active'):
