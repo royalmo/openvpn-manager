@@ -14,7 +14,7 @@ config = ConfigParser()
 config.read("settings.ini")
 
 TOKEN = config["TELEGRAM"]["BOT_TOKEN"]
-PERMITTED_CHATS = [int(x) for x in config["OPENVPN"].values()]
+PERMITTED_CHATS = [int(x) for x in config["ADMINS"].values()]
 
 
 def get_active_profiles():
