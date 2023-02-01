@@ -13,8 +13,8 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 config = ConfigParser()
 config.read("settings.ini")
 
-OPENVPN_CONTROL_CHAT_ID = int(config["OPENVPN"]["CONTROL_CHAT_ID"])
 TOKEN = config["TELEGRAM"]["BOT_TOKEN"]
+PERMITTED_CHATS = [int(x) for x in config["OPENVPN"].values()]
 
 
 def get_active_profiles():
@@ -86,11 +86,17 @@ def revoke_profile(profile_name):
 
 def handle(msg):
     content_type, _, chat_id = telepot.glance(msg)
+    print(f"[INFO] Got message from chat_id {chat_id}.s")
 
-    if (OPENVPN_CONTROL_CHAT_ID != 0 and chat_id != OPENVPN_CONTROL_CHAT_ID) or content_type != 'text':
+    if content_type != 'text':
         return
     
     message = msg['text']
+    print(f"[INFO] Message text: {message}")
+
+    if len(PERMITTED_CHATS) != 0 and chat_id not in PERMITTED_CHATS:
+        return
+    
     if message.startswith('/create'):
         splitted_message = message.split(' ')
         if len(splitted_message) != 2:
