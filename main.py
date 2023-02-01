@@ -86,13 +86,21 @@ def revoke_profile(profile_name):
 
 def handle(msg):
     content_type, _, chat_id = telepot.glance(msg)
-    print(f"[INFO] Got message from chat_id {chat_id}.s")
+    print(f"[INFO] Got message from chat_id {chat_id}.")
 
     if content_type != 'text':
         return
     
     message = msg['text']
     print(f"[INFO] Message text: {message}")
+
+    if message == '/start':
+        bot.sendMessage(chat_id, "Hello! I'm the manager of NavLab's VPN services.\nType `/help` to see the available commands. Beware that you need to be an administrator in order to use me!", parse_mode='Markdown')
+        return
+    
+    if message == '/help':
+        bot.sendMessage(chat_id, "*BOT COMMANDS*\n`/start` - Welcome message.\n`/help` - Display the list of commands.\n`/create <profile_name>` - Create an OpenVPN profile.\n`/revoke <profile_name>` - Revoke an OpenVPN profile.\n`/active` - List active OpenVPN profiles.", parse_mode='Markdown')
+        return
 
     if len(PERMITTED_CHATS) != 0 and chat_id not in PERMITTED_CHATS:
         return
