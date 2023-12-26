@@ -90,3 +90,25 @@ python3 /home/pi/Documents/openvpn-manager/main.py
 
 Do you want to see the stdout of the program? You can use something like
 GNU `screen`.
+
+## Extra: customize the Telegram bot
+
+By talkint to `@BotFather` you can make your bot a little bit more yours. One
+of the cool features you can add is a list of available commands. This will
+always be helpful to the users.
+
+Here you have the screenshot of the commands I introduced in my bot:
+
+<img width="370" alt="image" src="https://github.com/royalmo/openvpn-manager/assets/49844173/91f62329-eeb0-40f9-9a35-e911079d3831">
+
+If you want to do it with your bot you will have to tell `/setcommands` to
+`@BotFather`. Then, introduce the name of your bot. Once done, you can
+write the command list, just like this example:
+
+```
+start - Welcome message.
+help - Display the list of commands.
+create - Create an OpenVPN profile.
+revoke - Revoke an OpenVPN profile.
+active - List active OpenVPN profiles.
+```
