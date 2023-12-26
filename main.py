@@ -13,8 +13,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 config = ConfigParser()
 config.read("settings.ini")
 
-TOKEN = config["TELEGRAM"]["BOT_TOKEN"]
+TOKEN = config["GENERAL"]["BOT_TOKEN"]
 PERMITTED_CHATS = [int(x) for x in config["ADMINS"].values()]
+SERVER_NAME = config["GENERAL"]["SERVER_NAME"]
 
 
 def get_active_profiles():
@@ -95,7 +96,7 @@ def handle(msg):
     print(f"[INFO] Message text: {message}")
 
     if message == '/start':
-        bot.sendMessage(chat_id, "Hello! I'm the manager of NavLab's VPN services.\nType `/help` to see the available commands. Beware that you need to be an administrator in order to use me!", parse_mode='Markdown')
+        bot.sendMessage(chat_id, f"Hello! I'm the manager of {SERVER_NAME}'s VPN services.\nType `/help` to see the available commands. Beware that you need to be an administrator in order to use me!", parse_mode='Markdown')
         return
     
     if message == '/help':
