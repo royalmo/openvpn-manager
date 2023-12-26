@@ -1,9 +1,23 @@
 # OpenVPN Manager
 
-A Telegram bot that manages OpenVPN's profiles remotely in a Raspberry Pi
+A Telegram bot that manages OpenVPN's profiles remotely in a Raspberry Pi.
 
-Install python3
-pip3 install telepot
+## What's this for?
+
+You just got a VPS, raspberry, whatever and you want to use it as a VPN (and
+maybe other things too, not only as a VPN). You saw that OpenVPN let's you
+create your own VPN server for free and is very compatible.
+
+However, OpenVPN's interface for installing it and creating, managing and
+revoking profiles (people that can use the VPN) is very counterintuitive. That's
+why the community created `openvpn-install.sh`.
+
+This script is very good but sometimes you'll need to edit the profiles while
+you're not at home, and accessing the server console is not always possible.
+
+This repository links the script's essentials to a Telegram Bot so new profiles
+can be created, existing ones can be revoked, and only the whitelisted Telegram
+users can do it!
 
 # Try it!
 
