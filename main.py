@@ -23,6 +23,8 @@ def verbose(text):
     if not VERBOSE_INFO: return
     print(f"[INFO] {text}")
 
+verbose("Verbose is enabled.")
+
 def get_active_profiles():
     """
     Returns a list of strings each representing an active OpenVPN profile.
@@ -132,8 +134,9 @@ def handle(msg):
             verbose("New profile name already in use. Aborting.")
             bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` is already in use!", parse_mode='Markdown')
             return
+        openvpn_stringio = create_profile(new_profile_name)
         bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` created!", parse_mode='Markdown')
-        bot.sendDocument(chat_id, document=(f"{new_profile_name}.ovpn", create_profile(new_profile_name)))
+        bot.sendDocument(chat_id, document=(f"{new_profile_name}.ovpn", openvpn_stringio))
         return
 
     if message.startswith('/revoke'):
