@@ -1,6 +1,7 @@
 #!/bin/env/python3
 
 import os
+import sys
 import time
 import telepot
 from io import StringIO
@@ -16,14 +17,21 @@ config.read("settings.ini")
 TOKEN = config["GENERAL"]["BOT_TOKEN"]
 PERMITTED_CHATS = [int(x) for x in config["ADMINS"].values()]
 SERVER_NAME = config["GENERAL"]["SERVER_NAME"]
+VERBOSE_INFO = len(sys.argv) == 2 and sys.argv[1] == '-v'
 
+def verbose(text):
+    if not VERBOSE_INFO: return
+    print(f"[INFO] {text}")
 
 def get_active_profiles():
     """
     Returns a list of strings each representing an active OpenVPN profile.
     """
+    verbose("Getting active profiles")
     stream = os.popen("tail -n +2 /etc/openvpn/server/easy-rsa/pki/index.txt | grep \"^V\" | cut -d '=' -f 2")
-    return list(filter(len, stream.read().split('\n')))
+    active_profiles = list(filter(len, stream.read().split('\n')))
+    verbose(f"Active profiles: {active_profiles}")
+    return active_profiles
 
 
 def create_profile(new_profile_name):
@@ -51,6 +59,7 @@ def create_profile(new_profile_name):
     } > ~/"$client".ovpn
     ```
     """
+    verbose(f"Started creating a profile: {new_profile_name}")
     os.chdir("/etc/openvpn/server/easy-rsa/")
     os.system(f"/etc/openvpn/server/easy-rsa/easyrsa --batch --days=3650 build-client-full {new_profile_name} nopass")
     output1 = os.popen("cat /etc/openvpn/server/client-common.txt").read()
@@ -58,6 +67,7 @@ def create_profile(new_profile_name):
     output3 = os.popen(f"sed -ne '/BEGIN CERTIFICATE/,$ p' /etc/openvpn/server/easy-rsa/pki/issued/{new_profile_name}.crt").read()
     output4 = os.popen(f"cat /etc/openvpn/server/easy-rsa/pki/private/{new_profile_name}.key").read()
     output5 = os.popen("sed -ne '/BEGIN OpenVPN Static key/,$ p' /etc/openvpn/server/tc.key").read()
+    verbose("All commands executed, creating StringIO")
 
     return StringIO(f"{output1}<ca>\n{output2}</ca>\n<cert>\n{output3}</cert>\n<key>\n{output4}</key>\n<tls-crypt>\n{output5}</tls-crypt>\n")
 
@@ -77,12 +87,14 @@ def revoke_profile(profile_name):
     chown nobody:nogroup /etc/openvpn/server/crl.pem
     ```
     """
+    verbose(f"Starting commands to revoke a profile: {profile_name}")
     os.chdir("/etc/openvpn/server/easy-rsa/")
     os.system(f"/etc/openvpn/server/easy-rsa/easyrsa --batch revoke {profile_name}")
     os.system("/etc/openvpn/server/easy-rsa/easyrsa --batch --days=3650 gen-crl")
     os.system("rm -f /etc/openvpn/server/crl.pem")
     os.system("cp /etc/openvpn/server/easy-rsa/pki/crl.pem /etc/openvpn/server/crl.pem")
     os.system("chown nobody:nogroup /etc/openvpn/server/crl.pem")
+    verbose("Profile revoked successfully")
 
 
 def handle(msg):
@@ -104,16 +116,20 @@ def handle(msg):
         return
 
     if len(PERMITTED_CHATS) != 0 and chat_id not in PERMITTED_CHATS:
+        verbose("User is not an ADMIN and whitelist is enabled. Aborting.")
         return
     
     if message.startswith('/create'):
+        verbose("Processing /create command")
         splitted_message = message.split(' ')
         if len(splitted_message) != 2:
             bot.sendMessage(chat_id, "*SyntaxError!* Usage: `/create <new_profile_name>`", parse_mode='Markdown')
+            verbose("Bad syntax. Aborting.")
             return
         new_profile_name = splitted_message[1]
         active_profiles = get_active_profiles()
         if new_profile_name in active_profiles:
+            verbose("New profile name already in use. Aborting.")
             bot.sendMessage(chat_id, f"*ValueError!* Profile name `{new_profile_name}` is already in use!", parse_mode='Markdown')
             return
         bot.sendMessage(chat_id, f"*Done!* Profile name `{new_profile_name}` created!", parse_mode='Markdown')
@@ -121,20 +137,24 @@ def handle(msg):
         return
 
     if message.startswith('/revoke'):
+        verbose("Processing /revoke command")
         splitted_message = message.split(' ')
         if len(splitted_message) != 2:
             bot.sendMessage(chat_id, "*SyntaxError!* Usage: `/revoke <profile_name>`", parse_mode='Markdown')
+            verbose("Bad syntax. Aborting.")
             return
         profile_name = splitted_message[1]
         active_profiles = get_active_profiles()
         if profile_name not in active_profiles:
             bot.sendMessage(chat_id, f"*ValueError!* Profile name `{profile_name}` doesn't exist!", parse_mode='Markdown')
+            verbose("Profile doesn't exist already. Aborting.")
             return
         revoke_profile(profile_name)
         bot.sendMessage(chat_id, f"*Done!* Profile name `{profile_name}` revoked!", parse_mode='Markdown')
         return
 
     if message.startswith('/active'):
+        verbose("Processing /active command")
         active_profiles = get_active_profiles()
         if len(active_profiles) > 0:
             parsed_profiles = '\n- '.join(active_profiles)
