@@ -13,7 +13,7 @@ FROM debian:stable
 
 # Install dependencies
 RUN apt update
-RUN apt install -y python3 python3-pip wget
+RUN apt install -y python3 python3-pip wget iproute2
 RUN python3 -m pip install telepot --break-system-packages
 
 # Install openvpn
@@ -23,6 +23,7 @@ RUN chmod +x  openvpn-install.sh
 # Copy telegram bot
 RUN mkdir openvpn-bot
 COPY main.py /openvpn-bot/
+COPY systemctl-mock.sh /usr/local/bin/systemctl
 
 # Expose the VPN port (1194 is the default one but choose what you want)
 EXPOSE 1194

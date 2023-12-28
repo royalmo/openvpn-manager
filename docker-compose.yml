@@ -11,3 +11,4 @@ services:
       - "1194:1194"
     volumes:
       - ./settings.ini:/openvpn-bot/settings.ini
+    privileged: true
