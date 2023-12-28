@@ -13,7 +13,7 @@ FROM debian:stable
 
 # Install dependencies
 RUN apt update
-RUN apt install -y python3 python3-pip
+RUN apt install -y python3 python3-pip wget
 RUN python3 -m pip install telepot --break-system-packages
 
 # Install openvpn
