@@ -23,7 +23,10 @@ RUN chmod +x  openvpn-install.sh
 # Copy telegram bot
 RUN mkdir openvpn-bot
 COPY main.py /openvpn-bot/
+
+# Copying mocks
 COPY systemctl-mock.sh /usr/local/bin/systemctl
+COPY systemd-detect-virt-mock.sh /usr/local/bin/systemd-detect-virt
 
 # Expose the VPN port (1194 is the default one but choose what you want)
 EXPOSE 1194

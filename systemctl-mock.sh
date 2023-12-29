@@ -3,6 +3,8 @@
 case "$1" in
     enable)
         shift
+        # Removing --now
+        shift
         service="$1"
         shift
         echo "Enabled: $service"
@@ -10,9 +12,12 @@ case "$1" in
         ;;
     disable)
         shift
+        # Removing --now
+        shift
         service="$1"
         shift
         echo "Disabled: $service"
+        service "$service" stop
         # This is a no-op
         ;;
     is-active)
