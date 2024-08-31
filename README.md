@@ -81,19 +81,23 @@ sudo python3 main.py
 
 ## Run this program forever (even after restarts)
 
-Add to `/etc/rc.local`, just before the `exit 0;` line:
+If you're using Raspbian, add to `/etc/rc.local`, just before the `exit 0;`
+line:
 
 ```sh
-python3 /home/pi/Documents/openvpn-manager/main.py
+python3 /home/pi/Documents/openvpn-manager/main.py &
 ```
 **Caution!** Be sure to change the path to wherever you cloned the repository.
 
 Do you want to see the stdout of the program? You can use something like
-GNU `screen`.
+GNU's `screen`.
+
+If you use another Linux distribution you may want to google
+*execute script on start on {YOUR-DISTRO}* and follow a tutorial.
 
 ## Extra: customize the Telegram bot
 
-By talkint to `@BotFather` you can make your bot a little bit more yours. One
+By talking to `@BotFather` you can make your bot a little bit more yours. One
 of the cool features you can add is a list of available commands. This will
 always be helpful to the users.
 
