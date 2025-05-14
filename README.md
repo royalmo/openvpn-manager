@@ -79,21 +79,22 @@ Once done, you can run this program:
 sudo python3 main.py
 ```
 
-## Run this program forever (even after restarts)
+## Run this program forever
 
-If you're using Raspbian, add to `/etc/rc.local`, just before the `exit 0;`
-line:
+You will need to set up a systemd service that executes the Python script.
+**Important!** Place the script on a directory you'll never delete.
 
 ```sh
-python3 /home/pi/Documents/openvpn-manager/main.py &
+cd /path/to/openvpn-manager
+sudo sed "s|__WORKDIR__|$(pwd)|g" openvpn-manager.service | sudo tee /etc/systemd/system/openvpn-manager.service > /dev/null
+
+sudo systemctl daemon-reload
+sudo systemctl enable openvpn-manager.service
+sudo systemctl start openvpn-manager.service
 ```
-**Caution!** Be sure to change the path to wherever you cloned the repository.
 
-Do you want to see the stdout of the program? You can use something like
-GNU's `screen`.
-
-If you use another Linux distribution you may want to google
-*execute script on start on {YOUR-DISTRO}* and follow a tutorial.
+Use `sudo systemctl status openvpn-manager` to see if it started well or
+`sudo journalctl -u openvpn-manager.service -f` to see the logs.
 
 ## Extra: customize the Telegram bot
 
